@@ -1,5 +1,6 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
 
 //setup bigquery datastore
 const {BigQuery} = require('@google-cloud/bigquery');
@@ -16,7 +17,6 @@ async function registerUser(email, password) {
     .dataset(datasetId)
     .table(tableId)
     .insert(row)
-    .end();
 }
 
 const userRouter = express.Router();
@@ -34,25 +34,27 @@ userRouter.post('/register', [
       return value;
     }
   })
-], function(req, res){
-  const email = req.body.email;
-  const password = req.body.password;  
-  let errors = validationResult(req);
-  
-    if(!errors.isEmpty()){
-      console.log(errors);
-      res.send(errors);
-    } else {
-      try {
-        registerUser(email, password);
-        res
-        .status(200)
-        .send(email+' added to users table')
-        .end();
-    } catch (error) {
-        console.error(error);
-        res.send(error);
-    }
+], async (req, res) => {
+    try { 
+        let errors = validationResult(req);
+        if(!errors.isEmpty()){
+            console.log(errors);
+            res.send(errors);
+        } else {
+            const salt = await bcrypt.genSalt();
+            const hashedPassword = await bcrypt.hash(req.body.password,salt)
+            console.log("Salt:"+salt);
+            console.log("hashedPassword:"+hashedPassword);
+            
+            registerUser(req.body.email, hashedPassword);
+            
+            res
+            .status(200)
+            .send(req.body.email+' added to users table')
+            .end();
+        }
+    } catch {
+        res.status(500).send("FAILED");
     }
 });
 
