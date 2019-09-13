@@ -1,3 +1,6 @@
+'use strict';
+require('dotenv').config();
+var connection = require('./database');
 const express = require('express');
 const app = express();
 var bodyParser = require ('body-parser');
@@ -11,12 +14,22 @@ app.use(express.urlencoded({ extended: false }));
 const userRouter = require('./routes/userRouter.js');
 app.use(userRouter);
 
-app.get('/', (req, res) => {
-  res
-    .status(200)
-    .send('This is the api')
-    .end();
-});
+
+//ITS WORKING:
+// app.get('/', (req, res, next) => {
+//   connection.query('select * from users', 
+//   function(err, result, fields){
+//     if (err){
+//       console.log("fucken error");
+//       throw err;
+//     } 
+//     console.log("GET RESULTTTTTTTTT and thread id is :"+connection.threadId);
+//     res
+//     .status(200)
+//     .json(result)
+//     .end();
+//   });
+// });
 
 
 const PORT = process.env.PORT || 8080;

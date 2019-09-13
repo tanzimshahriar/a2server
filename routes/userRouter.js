@@ -1,24 +1,14 @@
+'use strict';
+require('dotenv').config();
+var connection = require('../database');
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 
-//setup bigquery datastore
-const {BigQuery} = require('@google-cloud/bigquery');
+//insert user to database
 async function registerUser(email, password) {
-  const datasetId = 'bigquery_a2_dataset';
-  const tableId = 'users';
-  const row = [{email: email, password: password}];
-
-  // Create a client
-  const bigqueryClient = new BigQuery();
-
-  // Insert user data into users table
-  await bigqueryClient
-    .dataset(datasetId)
-    .table(tableId)
-    .insert(row)
+  
 }
-
 const userRouter = express.Router();
 
 userRouter.post('/register', [
@@ -29,8 +19,7 @@ userRouter.post('/register', [
     if(value !==req.body.password){
       //throw error that password2 doesn't match
       throw new Error("password2 doesn't match password")
-    }
-    else{
+    } else {
       return value;
     }
   })
@@ -41,17 +30,29 @@ userRouter.post('/register', [
             console.log(errors);
             res.send(errors);
         } else {
-            const salt = await bcrypt.genSalt();
-            const hashedPassword = await bcrypt.hash(req.body.password,salt)
-            console.log("Salt:"+salt);
-            console.log("hashedPassword:"+hashedPassword);
-            
-            registerUser(req.body.email, hashedPassword);
-            
-            res
-            .status(200)
-            .send(req.body.email+' added to users table')
-            .end();
+          //password is hashed before storing in database
+          const salt = await bcrypt.genSalt();
+          const hashedPassword = await bcrypt.hash(req.body.password,salt)
+          const user = {
+            email: req.body.email,
+            password: hashedPassword
+          }
+          connection.query('INSERT INTO users SET ?', user, 
+          function(error, results){
+            if (error) {
+              console.error('An error occurred while executing the query')
+              res
+              .status(500)
+              .send("User not added. Server Error")
+              .end();
+            } else {
+              res
+              .status(200)
+              .send(req.body.email+' added to users table')
+              .end(); 
+            }
+            console.log(results);
+          })
         }
     } catch {
         res.status(500).send("FAILED");
