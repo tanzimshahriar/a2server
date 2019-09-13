@@ -1,5 +1,3 @@
-'use strict';
-require('dotenv').config();
 var connection = require('../database');
 const express = require('express');
 const { check, validationResult } = require('express-validator');
@@ -37,6 +35,7 @@ userRouter.post('/register', [
             email: req.body.email,
             password: hashedPassword
           }
+          // connection.query('INSERT INTO users(email,password) VALUES(?,?) ', user, 
           connection.query('INSERT INTO users SET ?', user, 
           function(error, results){
             if (error) {

@@ -1,24 +1,18 @@
 const mysql = require('mysql');
 
-
+var connection;
 
 // Database Connection for Production
-
-// let config = {
-//     user: process.env.SQL_USER,
-//     database: process.env.SQL_DATABASE,
-//     password: process.env.SQL_PASSWORD,
-// }
-
-// if (process.env.INSTANCE_CONNECTION_NAME && process.env.NODE_ENV === 'production') {
-//   config.socketPath = `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`;
-// }
-
-// let connection = mysql.createConnection(config);
-
-// Database Connection for Development
-
-let connection = mysql.createConnection({
+if (process.env.INSTANCE_CONNECTION_NAME && process.env.NODE_ENV === 'production') {
+  let config = {
+    user: process.env.SQL_USER,
+    password: process.env.SQL_PASSWORD,
+    database: process.env.SQL_DATABASE
+  }
+  config.socketPath = `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`;
+  connection = mysql.createConnection(config);
+} else {
+    connection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     database: process.env.DB_DATABASE,
@@ -32,5 +26,11 @@ let connection = mysql.createConnection({
       }
       console.log('Connected as thread id: ' + connection.threadId);
     });  
+}
+
+
+// Database Connection for Development
+
+
 
 module.exports = connection;
