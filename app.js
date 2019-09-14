@@ -1,3 +1,6 @@
+'use strict';
+require('dotenv').config();
+var connection = require('./database');
 const express = require('express');
 const app = express();
 var bodyParser = require ('body-parser');
@@ -11,11 +14,9 @@ app.use(express.urlencoded({ extended: false }));
 const userRouter = require('./routes/userRouter.js');
 app.use(userRouter);
 
-app.get('/', (req, res) => {
-  res
-    .status(200)
-    .send('This is the api')
-    .end();
+
+app.get('/', (req, res, next) => {
+  res.send("THIS IS THE API")
 });
 
 
