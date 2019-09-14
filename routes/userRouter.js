@@ -1,99 +1,90 @@
-var connection = require('../database');
 const express = require('express');
-const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
-
+const Joi = require('joi');
+const jwt = require('jsonwebtoken');
 const userRouter = express.Router();
 
-userRouter.post('/register', [
-  check('email').not().isEmpty().withMessage('email is required.'),
-  check('email').isEmail(),
-  check('password').not().isEmpty().withMessage('password is required.'),
-  check('password2').custom((value, { req, loc, path }) => {
-    if (value !== req.body.password) {
-      //throw error that password2 doesn't match
-      throw new Error("password2 doesn't match password")
-    } else {
-      return value;
-    }
-  })
-], async (req, res) => {
+const registerSchema = {
+  email: Joi.string().required().email(),
+  password: Joi.string().min(6).required()
+}
+const loginSchema = {
+  email: Joi.string().required().email(),
+  password: Joi.string().required()
+}
+
+userRouter.post('/register', async (req, res) => {
   try {
-    let errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.send(errors);
-    } else {
-      //password is hashed before storing in database
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(req.body.password, salt)
-      const user = {
-        email: req.body.email,
-        password: hashedPassword
-      }
-      // connection.query('INSERT INTO users(email,password) VALUES(?,?) ', user, 
-      connection.query('INSERT INTO users SET ?', user,
-        function (error, results, fields) {
-          if (error) {
-            res
-              .status(400)
-              .send(error.code)
-          } else {
-            res
-              .status(200)
-              .send(req.body.email + ' added to users table')
-          }
-        })
+    const validationError = Joi.validate(req.body, registerSchema);
+    if (validationError.error) {
+      return res.status(400).json({
+        msg: validationError.error.details[0].message
+      })
     }
+    //password is hashed before storing in database
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(req.body.password, salt)
+    const user = {
+      email: req.body.email,
+      password: hashedPassword
+    }
+    connection.query('INSERT INTO users SET ?', user,
+      function (error, results, fields) {
+        if (error) {
+          res.status(400).json({ErrorCode: error.code,msg:'Failed to register user'});
+        } else {
+          res.status(200).json({msg: (req.body.email + ' added to users table')})
+        }
+      })
+
   } catch {
-    res.status(500).send("FAILED");
+    res.status(500).json({msg:"failed to register user"});
   }
 });
 
-userRouter.post('/login',
-  [
-    check('email').not().isEmpty().withMessage('email is required.'),
-    check('email').isEmail(),
-    check('password').not().isEmpty().withMessage('password is required.')
-  ], (req, res) => {
-      let valErrors = validationResult(req);
-      if (!valErrors.isEmpty()) {
-        //Invalid user input
-        res.send(valErrors);
-      } else {
-      connection.query("SELECT email, password FROM users WHERE email = ?", req.body.email,
-        async function (error, result, fields) {
-          try{
-            if (Object.keys(result).length!==1) {
-              let error = {
-                value: req.body.email,
-                msg: "No user Exists",
-                param: "email",
-                location: "body"
-              }
-              //query doesn't find any user
-              res.status(401).send(error);
-            }
-            else {
-              if (await bcrypt.compare(req.body.password, result[0].password)){
-                res.status(200).send('Success');
-              } else {
-                let error = {
-                  value: "hidden",
-                  msg: "Wrong Password",
-                  param: "password",
-                  location: "body"
-                }
-                res.status(401).send(error);
-              }      
-            }
-          } catch {
-            console.log(error);
-            res.status(400).send(error)
-          }
-          
-        });
+userRouter.post('/login', (req, res) => {
+  const validationError = Joi.validate(req.body, loginSchema);
+    if (validationError.error) {
+      return res.status(400).json({
+        msg: validationError.error.details[0].message
+      })
     }
-  });
+  connection.query("SELECT email, password FROM users WHERE email = ?", req.body.email,
+    async function (error, result, fields) {
+      try {
+        if (Object.keys(result).length !== 1) {
+          let error = {
+            value: req.body.email,
+            msg: "Email not found",
+            param: "email",
+            location: "body"
+          }
+          //query doesn't find any user
+          res.status(401).json({error});
+        }
+        else {
+          if (await bcrypt.compare(req.body.password, result[0].password)) {
+            const token = jwt.sign({_id: req.body.email},process.env.TOKEN_SECRET);
+            res.status(200).json({msg: 'Logged in!',token});
+            res.header('auth-token',token).send(token);
+          } else {
+            let error = {
+              value: "hidden",
+              msg: "Wrong Password",
+              param: "password",
+              location: "body"
+            }
+            res.status(401).json({error});
+          }
+        }
+      } catch {
+        console.log(error);
+        res.status(400).json({error});
+      }
+
+    });
+
+});
 
 
 module.exports = userRouter
