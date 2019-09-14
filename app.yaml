@@ -1,5 +1,4 @@
-runtime: nodejs
-env: flex
+runtime: nodejs10
 env_variables:
   SQL_USER: tanzim
   SQL_PASSWORD: 12345678

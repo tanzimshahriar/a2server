@@ -15,41 +15,9 @@ const userRouter = require('./routes/userRouter.js');
 app.use(userRouter);
 
 
-//ITS WORKING:
 app.get('/', (req, res, next) => {
-  connection.query('select * from users', 
-  function(err, result, fields){
-    if (err){
-      console.log("fucken error");
-      throw err;
-    } 
-    console.log("GET RESULTTTTTTTTT and thread id is :"+connection.threadId);
-    res
-    .status(200)
-    .json(result)
-    .end();
-  });
+  res.send("THIS IS THE API")
 });
-
-
-// var user = ["batman@batman.com","IAMBATMAN"];
-// app.get('/', (req, res, next) => {
-//   connection.query('INSERT INTO users(email,password) VALUES(?,?) ', user, 
-//   function(err, result, fields){
-//     if (err){
-//       console.log("fucken error");
-//       throw err;
-//     } 
-//     else{
-//       console.log("batman added to users");
-//       res
-//       .status(200)
-//       .json(result)
-//       .end();
-//     }
-    
-//   });
-// });
 
 
 const PORT = process.env.PORT || 8080;

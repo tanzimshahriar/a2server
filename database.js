@@ -27,10 +27,5 @@ if (process.env.INSTANCE_CONNECTION_NAME && process.env.NODE_ENV === 'production
       console.log('Connected as thread id: ' + connection.threadId);
     });  
 }
-
-
 // Database Connection for Development
-
-
-
 module.exports = connection;
