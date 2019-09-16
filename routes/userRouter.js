@@ -33,7 +33,10 @@ userRouter.post('/register', async (req, res) => {
         if (error) {
           res.status(400).json({ErrorCode: error.code,msg:'Failed to register user'});
         } else {
-          res.status(200).json({msg: (req.body.email + ' added to users table')})
+          res.status(200).json({
+            msg: 'Signup Successful for ' + (req.body.email), 
+            result: "Success"
+          })
         }
       })
 
@@ -66,7 +69,7 @@ userRouter.post('/login', (req, res) => {
           if (await bcrypt.compare(req.body.password, result[0].password)) {
             const token = jwt.sign({_id: req.body.email},process.env.TOKEN_SECRET);
             res.header('auth-token',token).send(token);
-            res.status(200).json({msg: 'Logged in!',token});
+            res.status(200).json({msg: 'Logged in Successfully', result: "Success", token});
           } else {
             let error = {
               value: "hidden",
