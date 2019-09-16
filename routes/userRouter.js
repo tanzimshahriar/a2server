@@ -69,7 +69,7 @@ userRouter.post('/login', (req, res) => {
           if (await bcrypt.compare(req.body.password, result[0].password)) {
             const token = jwt.sign({_id: req.body.email},process.env.TOKEN_SECRET);
             res.header('auth-token',token).send(token);
-            res.status(200).json({msg: 'Logged in Successfully', result: "Success", token});
+            res.status(200).json({msg: 'Logged in Successfully', result: "Success"});
           } else {
             let error = {
               value: "hidden",
