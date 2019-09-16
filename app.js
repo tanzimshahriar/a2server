@@ -1,5 +1,6 @@
 'use strict';
 require('dotenv').config();
+const cors = require('cors');
 var connection = require('./database');
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -11,6 +12,10 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 
 // set up global middleware
+const allowedCorsSites = {
+  origin: "https://assignment-two-app.appspot.com"
+}
+app.use(cors(allowedCorsSites));
 const userRouter = require('./routes/userRouter.js');
 const userInfo = require('./routes/userInfo.js');
 app.use(connection);
