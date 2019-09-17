@@ -18,7 +18,8 @@ userRouter.post('/register', async (req, res) => {
     const validationError = Joi.validate(req.body, registerSchema);
     if (validationError.error) {
       return res.status(400).json({
-        msg: validationError.error.details[0].message
+        msg: validationError.error.details[0].message,
+        errorCode: "VALIDATION_ERROR"
       })
     }
     //password is hashed before storing in database
@@ -31,7 +32,7 @@ userRouter.post('/register', async (req, res) => {
     connection.query('INSERT INTO users SET ?', user,
       function (error, results, fields) {
         if (error) {
-          res.status(400).json({ErrorCode: error.code,msg:'Failed to register user'});
+          res.status(400).json({errorCode: error.code, msg:'Failed to register user'});
         } else {
           res.status(200).json({
             msg: 'Signup Successful for ' + (req.body.email), 
@@ -49,21 +50,16 @@ userRouter.post('/login', (req, res) => {
   const validationError = Joi.validate(req.body, loginSchema);
     if (validationError.error) {
       return res.status(400).json({
-        msg: validationError.error.details[0].message
+        msg: validationError.error.details[0].message,
+        errorCode: "VALIDATION_ERROR"
       })
     }
   connection.query("SELECT email, password, type FROM users WHERE email = ?", req.body.email,
     async function (error, result, fields) {
       try {
         if (Object.keys(result).length !== 1) {
-          let error = {
-            value: req.body.email,
-            msg: "Email not found",
-            param: "email",
-            location: "body"
-          }
           //query doesn't find any user
-          res.status(401).json({error});
+          res.status(400).json({msg: "No user found", errorCode: "USER_NOT_FOUND"});
         }
         else {
           if (await bcrypt.compare(req.body.password, result[0].password)) {
@@ -76,17 +72,11 @@ userRouter.post('/login', (req, res) => {
               userType: result.type,
             });
           } else {
-            let error = {
-              value: "hidden",
-              msg: "Wrong Password",
-              param: "password",
-              location: "body"
-            }
-            res.status(401).json({error});
+            res.status(401).json({msg: "Incorrect password or email",  errorCode: "WRONG_PASSWORD"});
           }
         }
       } catch {
-        res.status(400).json({error});
+        res.status(400).json({msg: "Login failed. Please try again",  errorCode: "UNKNOWN_ERROR"});
       }
 
     });
