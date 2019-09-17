@@ -52,7 +52,7 @@ userRouter.post('/login', (req, res) => {
         msg: validationError.error.details[0].message
       })
     }
-  connection.query("SELECT email, password FROM users WHERE email = ?", req.body.email,
+  connection.query("SELECT email, password, type FROM users WHERE email = ?", req.body.email,
     async function (error, result, fields) {
       try {
         if (Object.keys(result).length !== 1) {
@@ -68,8 +68,13 @@ userRouter.post('/login', (req, res) => {
         else {
           if (await bcrypt.compare(req.body.password, result[0].password)) {
             const token = jwt.sign({_id: req.body.email},process.env.TOKEN_SECRET);
-            res.header('auth-token',token).send(token);
-            res.status(200).json({msg: 'Logged in Successfully', result: "Success", token});
+            console.log(result);
+            res.header('auth-token', token).json({
+              token: token,
+              msg: "Logged in Successfully",
+              result: "Success",
+              userType: result.type,
+            });
           } else {
             let error = {
               value: "hidden",
@@ -81,7 +86,6 @@ userRouter.post('/login', (req, res) => {
           }
         }
       } catch {
-        console.log(error);
         res.status(400).json({error});
       }
 

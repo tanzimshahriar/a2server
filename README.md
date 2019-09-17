@@ -33,11 +33,12 @@ use ServerDatabase;
   `use YOUR_DATABASE_NAME;` 
   Now create the following tables using mysqlWorkbench:
   `use YOUR_DATABASE_NAME;
-  CREATE TABLE IF NOT EXISTS users (
-    email varchar(255) NOT NULL,
-    password varchar(255) NOT NULL,
-    PRIMARY KEY (email)
-  ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;`
+ CREATE TABLE IF NOT EXISTS `users` (
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `type` varchar(10) DEFAULT 'user',
+  PRIMARY KEY (`email`)
+) DEFAULT CHARSET=utf8;
   ```
   ```
   F. Create a .env file in the project home directory and add the following lines in .env file.
