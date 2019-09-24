@@ -48,6 +48,7 @@ use ServerDatabase;
   DB_PASS=password
   INSTANCE_CONNECTION_NAME=instanceConnectionName
   NODE_ENV=production`
+  DATABASE_TYPE=google
   
   VERY IMPORTANT: go to .gitignore and add .env so your database information isn't uploaded to github.
 
