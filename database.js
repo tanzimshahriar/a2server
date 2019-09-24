@@ -4,7 +4,6 @@ module.exports = (req, res, next) => {
   // Database Connection for google sql when in production
   if (process.env.NODE_ENV == "production" && process.env.DATABASE_TYPE == 'google') {
     let config = {
-      connectionLimit: 1,
       user: process.env.SQL_USER,
       password: process.env.SQL_PASSWORD,
       database: process.env.SQL_DATABASE

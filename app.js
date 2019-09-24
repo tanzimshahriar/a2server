@@ -23,7 +23,7 @@ else {
 }
 
 const userRouter = require('./routes/userRouter.js');
-const userInfo = require('./routes/userInfo.js');
+const userInfo = require('./routes/LoggedInUser/customerRouter.js');
 app.use(connection);
 app.use(userRouter);
 app.use(userInfo);

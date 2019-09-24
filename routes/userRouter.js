@@ -70,8 +70,9 @@ userRouter.post('/login', (req, res) => {
         }
         else {
           if (await bcrypt.compare(req.body.password, result[0].password)) {
+            
+            const token = jwt.sign({email: req.body.email},process.env.TOKEN_SECRET);
             if(result[0].status) {
-              const token = jwt.sign({_id: req.body.email},process.env.TOKEN_SECRET);
               console.log(result[0]);
               res.header('auth-token', token).json({
                 token: token,
@@ -81,7 +82,8 @@ userRouter.post('/login', (req, res) => {
               });
             }
             else {
-              res.json({
+              res.header('auth-token', token).json({
+                token: token,
                 msg: "Please verify your email first",
                 result: "Unverified",
                 userType: result[0].type,
@@ -98,27 +100,6 @@ userRouter.post('/login', (req, res) => {
 
     });
 
-});
-
-userRouter.post('/verify', (req, res) => {
-  connection.query("SELECT email, status, secretToken FROM users WHERE secretToken = ?", req.body.secretToken,
-  (error, result, field) => {
-    if (error) {
-      console.log(error);
-      res.status(400).json({error: error, msg: "Invalid confirmation code", errorCode: "Invalid"});
-    }
-    else if (Object.keys(result).length !== 1) {
-      //query doesn't find any user
-      res.status(400).json({msg: "No user found", errorCode: "USER_NOT_FOUND"});
-    }
-    else if (Object.keys(result).length == 1 && result.secretToken == req.body.secretToken) {
-      result.status = true;
-      res.status(200).json({msg: (result.email+" has been verified"), result: "Success"})
-    }
-    else {
-      res.status(400).json({msg: "Invalid code, not verified", errorCode: "Invalid"})
-    }
-  });
 });
 
 
