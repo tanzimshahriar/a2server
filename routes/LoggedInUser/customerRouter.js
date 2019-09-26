@@ -34,4 +34,30 @@ router.post('/user/verifyuser', verify, (req, res) => {
         })
 })
 
+router.get('/user/getverificationstatus', verify, (req, res) => {
+
+    const email = req.user.email
+
+    connection.query("SELECT email, status FROM users WHERE email =?", req.user.email,
+        function (error, result, fields) {
+            if(error){
+                res.status(400).json({
+                    "msg": "Failed to see verification status",
+                    "ErrorCode": error.errorCode
+                })
+            }
+            if (result[0].status) {
+                res.status(200).json({
+                    "result": "Verified"
+                })
+            }
+            else {
+                res.status(200).json({
+                    "result": "unverified"
+                })
+            }
+            
+        })
+})
+
 module.exports = router;
