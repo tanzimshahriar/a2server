@@ -42,12 +42,16 @@ userRouter.post('/register', async (req, res) => {
           console.log(error)
           res.status(400).json({errorCode: error.code, msg:'Failed to register user'});
         } else {
-          const textBody = "Please complete your signup. Your verification code is "+secretToken
+          const html = ("<h1>Verify your account</h1></br><p>Hi " + req.body.email.split('@')[0] + 
+          ",</p><p>Thanks for signing up.</p><p>To confirm your account, login at " + 
+          "<a>https://assignment-two-app.appspot.com/login</a> and enter the following verification code <Strong>"
+           + secretToken + "</Strong></p>");
+          //const textBody = "Please complete your signup. Your verification code is "+secretToken
           const email = {
             from: "Admin <realemail167@gmail.com>",
             to: req.body.email,
             subject: "Confirm your account signup",
-            text: textBody
+            html: html
           }
           await mailer.sendEmail(email)
           res.status(200).json({
