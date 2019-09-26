@@ -12,12 +12,18 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 
 // set up global middleware
-const allowedCorsSites = {
-  origin: "https://assignment-two-app.appspot.com"
+if (process.env.NODE_ENV=="production") {
+  const allowedCorsSites = {
+    origin: "https://assignment-two-app.appspot.com"
+  }
+  app.use(cors(allowedCorsSites));
 }
-app.use(cors(allowedCorsSites));
+else {
+  app.use(cors())
+}
+
 const userRouter = require('./routes/userRouter.js');
-const userInfo = require('./routes/userInfo.js');
+const userInfo = require('./routes/LoggedInUser/customerRouter.js');
 app.use(connection);
 app.use(userRouter);
 app.use(userInfo);
