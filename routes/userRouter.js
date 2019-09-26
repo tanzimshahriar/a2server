@@ -4,6 +4,7 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const userRouter = express.Router();
 const randomstring = require('randomstring');
+const mailer = require("../misc/mailer")
 
 const registerSchema = {
   email: Joi.string().required().email(),
@@ -36,12 +37,21 @@ userRouter.post('/register', async (req, res) => {
       secretToken: secretToken,
     }
     connection.query('INSERT INTO users SET ?', user,
-      function (error, results, fields) {
+      async function (error, results, fields) {
         if (error) {
           console.log(error)
           res.status(400).json({errorCode: error.code, msg:'Failed to register user'});
         } else {
+          const textBody = "Please complete your signup. Your verification code is "+secretToken
+          const email = {
+            from: "Admin <realemail167@gmail.com>",
+            to: req.body.email,
+            subject: "Confirm your account signup",
+            text: textBody
+          }
+          await mailer.sendEmail(email)
           res.status(200).json({
+            //send email
             msg: 'Signup Successful for ' + (req.body.email), 
             result: "Success"
           })
