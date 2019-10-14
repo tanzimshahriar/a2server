@@ -77,6 +77,8 @@ userRouter.post('/login', (req, res) => {
     }
   connection.query("SELECT email, password, type, status FROM users WHERE email = ?", req.body.email,
     async function (error, result, fields) {
+      console.log(result)
+      console.log(error)
       try {
         if (Object.keys(result).length !== 1) {
           //query doesn't find any user
