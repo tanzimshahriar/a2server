@@ -40,6 +40,7 @@ router.get('/user/getverificationstatus', verify, (req, res) => {
 
     connection.query("SELECT email, status FROM users WHERE email =?", req.user.email,
         function (error, result, fields) {
+            let tempEmail = result[0].email 
             if(error){
                 res.status(400).json({
                     "msg": "Failed to see verification status",
@@ -48,12 +49,14 @@ router.get('/user/getverificationstatus', verify, (req, res) => {
             }
             if (result[0].status) {
                 res.status(200).json({
-                    "result": "Verified"
+                    result: "Verified",
+                    email: tempEmail
                 })
             }
             else {
                 res.status(200).json({
-                    "result": "unverified"
+                    result: "unverified",
+                    email: tempEmail
                 })
             }
             
