@@ -14,8 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 // set up global middleware
 if (process.env.NODE_ENV=="production") {
   const allowedCorsSites = {
-    // origin: "https://assignment-two-app.appspot.com"
-    origin: "http://localhost:8081"
+    origin: "https://assignment-two-app.appspot.com"
   }
   app.use(cors(allowedCorsSites));
 }
