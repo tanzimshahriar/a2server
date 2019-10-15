@@ -1,8 +1,8 @@
 runtime: nodejs10
 env_variables:
-  SQL_USER: tanzim
+  SQL_USER: root
   SQL_PASSWORD: 12345678
-  SQL_DATABASE: ServerDatabase
-  INSTANCE_CONNECTION_NAME: assignment-two-server:us-central1:cca2database
+  SQL_DATABASE: shoppingapp
+  INSTANCE_CONNECTION_NAME: assignment-two-server:us-central1:serverdatabaseinstance
 beta_settings:
-  cloud_sql_instances: assignment-two-server:us-central1:cca2database
+  cloud_sql_instances: assignment-two-server:us-central1:serverdatabaseinstance
