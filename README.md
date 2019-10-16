@@ -31,19 +31,31 @@ use ServerDatabase;
   ```
   E. Select the database by:
   `use YOUR_DATABASE_NAME;` 
+  
   Now create the following tables using mysqlWorkbench:
   `use YOUR_DATABASE_NAME;
  CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `type` varchar(10) DEFAULT 'user',
+  `secretToken` varchar(255),
+  `status` boolean Default false,
   PRIMARY KEY (`email`)
 ) DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `products` (
+  `name` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `price` double NOT NULL,
+  `quantity` integer NOT NULL Default 0,
+  PRIMARY KEY (`name`)
+) DEFAULT CHARSET=utf8;
+
   ```
   ```
   F. Create a .env file in the project home directory and add the following lines in .env file.
   `DB_HOST=publicIPaddress
-  DB_DATABASE=serverDatabase
+  DB_DATABASE=shoppingapp
   DB_USER=root
   DB_PASS=password
   INSTANCE_CONNECTION_NAME=instanceConnectionName

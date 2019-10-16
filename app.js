@@ -3,7 +3,6 @@ require('dotenv').config();
 const cors = require('cors');
 var connection = require('./database');
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const app = express();
 var bodyParser = require ('body-parser');
 
@@ -11,7 +10,7 @@ var bodyParser = require ('body-parser');
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 
-// set up global middleware
+// set up global middlewares
 if (process.env.NODE_ENV=="production") {
   const allowedCorsSites = {
     origin: "https://assignment-two-app.appspot.com"
@@ -22,9 +21,11 @@ else {
   app.use(cors())
 }
 
+const productsRouter = require('./routes/productsRouter.js');
 const userRouter = require('./routes/userRouter.js');
 const userInfo = require('./routes/LoggedInUser/customerRouter.js');
 app.use(connection);
+app.use(productsRouter);
 app.use(userRouter);
 app.use(userInfo);
 
