@@ -4,7 +4,7 @@ const productsRouter = express.Router();
 
 productsRouter.get('/getproducts', (req, res) => {
 
-    connection.query("SELECT name, description, imagesrc, quantity FROM products",
+    connection.query("SELECT name, description, imagesrc, price, quantity FROM products",
         async function (error, results, fields) {
             try {
                 
