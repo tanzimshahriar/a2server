@@ -95,6 +95,7 @@ userRouter.post('/login', (req, res) => {
                 msg: "Logged in Successfully",
                 result: "Success",
                 userType: result[0].type,
+                email: req.body.email
               });
             }
             else {
@@ -103,6 +104,7 @@ userRouter.post('/login', (req, res) => {
                 msg: "Please verify your email first",
                 result: "Unverified",
                 userType: result[0].type,
+                email: req.body.email
               });
             }
             

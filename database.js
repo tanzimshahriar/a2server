@@ -2,7 +2,7 @@ const mysql = require('mysql');
 
 module.exports = (req, res, next) => {
   // Database Connection for google sql
-  if (process.env.DATABASE_TYPE == 'google' && process.env.NODE_ENV == "production") {
+  if (process.env.NODE_ENV == "production") {
     let config = {
       user: process.env.SQL_USER,
       password: process.env.SQL_PASSWORD,
@@ -15,10 +15,10 @@ module.exports = (req, res, next) => {
   } else {
      // local Database
     connection = mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      database: process.env.DB_DATABASE,
-      password: process.env.DB_PASS
+      host: "localhost",
+      user: "root",
+      database: "shoppingapp",
+      password: "12345678"
     });
 
     connection.connect(function (err) {

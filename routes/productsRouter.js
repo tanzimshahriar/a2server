@@ -4,7 +4,9 @@ const productsRouter = express.Router();
 
 productsRouter.get('/getproducts', (req, res) => {
 
-    connection.query("SELECT name, description, imagesrc, price, quantity FROM products",
+    const type = req.type && req.type!= ""? req.type : "asc";
+    const sortby = req.sortby && req.sortby != ""? req.sortby : "name";
+    connection.query("SELECT name, description, imagesrc, price, quantity FROM products ORDER BY " + sortby + " " + type,
         async function (error, results, fields) {
             try {
 
@@ -14,7 +16,6 @@ productsRouter.get('/getproducts', (req, res) => {
 
                     products.push(results[i])
                 }
-
                 res.status(200).json({
                     "msg": "Success",
                     "products": products
